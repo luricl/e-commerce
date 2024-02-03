@@ -3,8 +3,7 @@ from django.db import models
 
 # Challenge: reimplement this
 class User(AbstractUser):
-    # add reference to listings that belong to the user's watchlist
-    pass
+    id = models.AutoField(primary_key=True)
 
 class AuctionListings(models.Model):
     id = models.AutoField(primary_key=True)
@@ -14,6 +13,7 @@ class AuctionListings(models.Model):
     starting_bid = models.DecimalField(max_digits=1000000, decimal_places=2)
     image = models.URLField()
     category = models.CharField(max_length=64)
+    users_watching = models.ManyToManyField(User)
 
 class Bids(models.Model):
     id = models.AutoField(primary_key=True)
