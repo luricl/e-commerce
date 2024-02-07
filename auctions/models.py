@@ -7,13 +7,21 @@ class User(AbstractUser):
 
 class AuctionListings(models.Model):
     id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=64)
-    state = models.BooleanField(default=True)
-    description = models.CharField(max_length=64)
-    starting_bid = models.DecimalField(max_digits=1000000, decimal_places=2)
-    image = models.URLField()
+    title = models.CharField(max_length=64, unique=True)
+    active = models.BooleanField(default=True)
+    description = models.CharField(max_length=150)
+    starting_bid = models.DecimalField(max_digits=10, decimal_places=2)
+    current_bid = models.DecimalField(max_digits=10, decimal_places=2)
+    image_url = models.URLField()
     category = models.CharField(max_length=64)
     users_watching = models.ManyToManyField(User)
+
+    # https://www.geeksforgeeks.org/overriding-the-save-method-django-models/
+    def save(self, *args, **kwargs):
+        if not self.current_bid:
+            self.current_bid = self.starting_bid
+        super(AuctionListings, self).save(*args, **kwargs)
+
 
 class Bids(models.Model):
     id = models.AutoField(primary_key=True)
