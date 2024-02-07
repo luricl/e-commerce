@@ -9,7 +9,7 @@ from .models import User, AuctionListings, Bids, Comments
 
 
 def index(request):
-    all_listings = AuctionListings.objects.all().filter(state=True)
+    all_listings = AuctionListings.objects.filter(active=True)
 
     return render(request, "auctions/index.html", {"listings":all_listings})
 
@@ -67,13 +67,29 @@ def register(request):
 def create_listing(request):
     if request.method == "POST":
         try:
-            auction = AuctionListings(title=request.POST.title, description=request.POST.description, 
-                                    starting_bid=request.POST.starting_bid, photo=request.POST.photo)
+
+            auction = AuctionListings(
+                title=request.POST.get("title"), 
+                description=request.POST.get("description"),                     
+                starting_bid=float(request.POST.get("starting bid")), 
+                image_url=request.POST.get("image")
+            )
+            
             auction.save()
+            
             messages.success(request, "Listing created!")
+            
+            return HttpResponseRedirect(reverse("index"))
         except:
             messages.error(request, "action failed!")
 
-        return render(request, "auctions/index.html")
-    else:
-        return render(request, "auctions/create_listing.html")
+    return render(request, "auctions/create_listing.html")
+    
+def show_listing(request, item):
+
+    listing = AuctionListings.objects.get(title=item)
+
+    
+    return render(request, "auctions/listing.html", {
+        "listing": listing 
+    })
