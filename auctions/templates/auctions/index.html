@@ -1,32 +1,32 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h4>Active Listings</h4>
+    <h4>Active auctions</h4>
 
-    {% if listings %}
-    {% for listing in listings %}
+    {% if auctions %}
+    {% for auction in auctions %}
         <div class="col" >
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title"><a href="{% url 'show_listing' listing.title %}">{{ listing.title }}</a></h5>
+                    <h5 class="card-title">{{ auction.title }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="card-image">
-                            <img src="{{ listing.image_url }}">
+                            <img src="{{ auction.image_url }}">
                         </div>
                         <div>
-                            <p>{{ listing.description }}</p>
-                            <p>Current price: ${{ listing.current_bid }}</p>
+                            <p>{{ auction.description }}</p>
+                            <p>Current price: ${{ auction.current_bid }}</p>
                         </div>
                     </div>
-                    <a href="{% url 'show_listing' listing.title %}">Bid</a>
+                    <a href="{% url 'show_auction' auction.title %}">View</a>
                 </div>
             </div>
         </div>
     {% endfor %}
     {% else %}
-        <h3>No auctions for today!</h3>
+        <h5>No auctions for today!</h5>
     {% endif %}
     
 {% endblock %}

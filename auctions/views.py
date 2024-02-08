@@ -9,9 +9,9 @@ from .models import User, AuctionListings, Bids, Comments
 
 
 def index(request):
-    all_listings = AuctionListings.objects.filter(active=True)
+    auctions = AuctionListings.objects.filter(active=True)
 
-    return render(request, "auctions/index.html", {"listings":all_listings})
+    return render(request, "auctions/index.html", {"auctions" : auctions})
 
 def login_view(request):
     if request.method == "POST":
@@ -83,13 +83,12 @@ def create_listing(request):
         except:
             messages.error(request, "action failed!")
 
-    return render(request, "auctions/create_listing.html")
+    return render(request, "auctions/create_auction.html")
     
-def show_listing(request, item):
+def show_auction(request, item):
 
-    listing = AuctionListings.objects.get(title=item)
+    auction = AuctionListings.objects.get(title=item)
 
-    
-    return render(request, "auctions/listing.html", {
-        "listing": listing 
+    return render(request, "auctions/auction.html", {
+        "auction": auction 
     })

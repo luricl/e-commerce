@@ -1,0 +1,17 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <div>
+        <div>
+            <h3>{{ auction.title }}</h3>
+            <sub>{{ auction.category }}</sub>
+        </div>
+        <div class="w-auto p-3">
+            <img src="{{ auction.image_url }}" class="img-responsive" >
+        </div>    
+        <p>{{ auction.description }}</p>
+        <h5>{{ auction.starting_bid }}</h5>
+    </div>
+
+{% endblock %}
