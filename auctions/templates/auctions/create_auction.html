@@ -5,7 +5,7 @@
     {% if messages %}
         <div class="messages">
         {% for message in messages %}
-            <div class="alert alert-success">
+            <div class="alert alert-danger">
                 <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
                 {{ message }}
             </div>
@@ -14,48 +14,56 @@
     {% endif %}    
 
     <h2>Create Listings</h2>
-
-    <form method="POST">
+    
+    <form action="{% url 'create' %}" method="POST">
         {% csrf_token %}
-        <label for="title">
-            Title:
+        <div class="form-group">
+            <label for="title">Title:</label>
             <input 
             id="title" 
-            name="title" 
+            name="title"
+            class="form-control" 
             placeholder="Title" 
             required>
-        </label>
-        <label for="description">
-            Description:
+        </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
             <input 
             id="description" 
             name="description" 
+            class="form-control" 
             placeholder="Description" 
             required>
-        </label>
-        <label for="starting bid">
-            Starting bid:
+        </div>
+            <label for="starting bid">Starting bid:</label>
             <input 
             id="starting bid" 
             name="starting bid" 
+            class="form-control" 
             placeholder="Starting bid" 
             required>
-        </label>
-        <label for="image">
-            Image:
+        <div class="form-group">
+            <label for="image">Image:</label>
             <input 
             id="image" 
             name="image" 
+            class="form-control" 
             placeholder="Image url">
-        </label>
-        <label for="category">
-            Category:
-            <input 
+        </div>
+        <div class="form-group">
+            <label for="category">Category:</label>
+            <select 
+            class="form-select"
             id="category" 
             name="category" 
-            placeholder="Category">
-        </label>
-
+            class="form-control" 
+            aria-label="Default select example">
+                <option selected>Category</option>
+                {% for category in  categories %}
+                    <option value="{{ category.name }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
         <input type="submit" class="btn btn-success my-3"/>
     </form>
 
