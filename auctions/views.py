@@ -10,8 +10,17 @@ from .models import User, AuctionListings, Categories, Bids, Comments
 
 def index(request):
     auctions = AuctionListings.objects.filter(active=True)
+    categories = Categories.objects.all()
 
-    return render(request, "auctions/index.html", {"auctions" : auctions})
+    if request.method == "POST":
+        category = Categories.objects.get(name=request.POST.get("category"))
+        auctions = auctions.filter(category=category)
+
+    return render(request, "auctions/index.html", {
+        "auctions" : auctions,
+        "categories" : categories
+        })
+
 
 def login_view(request):
     if request.method == "POST":
@@ -64,6 +73,7 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
+
 def create_listing(request):
     if request.method == "POST":
         try:
@@ -91,9 +101,11 @@ def create_listing(request):
                     "categories" : categories
                 })
     
+
 def show_auction(request, item):
 
     auction = AuctionListings.objects.get(title=item)
+    bids = Bids.objects.get(auction_id=auction.id)
     # watchlist = User.auctionlistings_set.filter(username=request.).all()
 
     if request.method == "POST":
