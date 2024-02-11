@@ -1,0 +1,49 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h4>Watchlist</h4>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="category">Category:</label>
+            <select 
+            class="form-select"
+            id="category" 
+            name="category" 
+            class="form-control" 
+            aria-label="Default select example">
+            <option selected>Category</option> 
+            {% for category in  categories %}
+                <option value="{{ category.name }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" class="btn btn-success my-3"/>
+    </form>
+
+    {% if auctions %}
+    {% for auction in auctions %}
+        <div class="col" >
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">{{ auction.title }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="card-image">
+                            <img src="{{ auction.image_url }}" height="200px" width="auto">
+                        </div>
+                        <div>
+                            <p class="card-text">{{ auction.description }}</p>
+                            <p class="card-text">Current price: ${{ auction.current_bid }}</p>
+                        </div>
+                    </div>
+                    <a href="{% url 'show_auction' auction.title %}" class="btn btn-primary">View</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    {% else %}
+        <h5>Watchlist is empty!</h5>
+    {% endif %}
+{% endblock %}

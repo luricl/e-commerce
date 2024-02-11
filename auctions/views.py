@@ -117,3 +117,18 @@ def show_auction(request, item):
     return render(request, "auctions/auction.html", {
         "auction": auction 
     })
+
+def watchlist(request):
+    user = User.objects.get(username=request.user.username)
+    
+    auctions = user.watchlist.all()
+    categories = Categories.objects.all()
+
+    if request.method == "POST":
+        category = Categories.objects.get(name=request.POST.get("category"))
+        auctions = auctions.filter(category=category)
+
+    return render(request, "auctions/watchlist.html", {
+            "auctions" : auctions,
+            "categories" : categories
+        })
