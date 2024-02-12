@@ -14,13 +14,13 @@ class AuctionListings(models.Model):
     title = models.CharField(max_length=64, unique=True)
     author = models.ForeignKey(User, on_delete=models.PROTECT, related_name="auctions")
     image_url = models.URLField()
-    category = models.ForeignKey(Categories, on_delete=models.PROTECT, blank=True, related_name="auctions")
+    category = models.ForeignKey(Categories, on_delete=models.PROTECT, blank=True, null=True, related_name="auctions")
     creation_date = models.DateTimeField(auto_now_add=True)
     starting_bid = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.CharField(max_length=150)
     active = models.BooleanField(default=True)
     current_bid = models.DecimalField(max_digits=10, decimal_places=2)
-    users_watching = models.ManyToManyField(User, blank=True, null=True, related_name="watchlist")
+    users_watching = models.ManyToManyField(User, blank=True, related_name="watchlist")
 
     # https://www.geeksforgeeks.org/overriding-the-save-method-django-models/
     def save(self, *args, **kwargs):

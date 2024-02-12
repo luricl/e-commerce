@@ -78,22 +78,38 @@ def create_listing(request):
     if request.method == "POST":
         try:
             author = request.user
-            category = Categories.objects.get(name=request.POST.get("category"))
-
-            auction = AuctionListings(
-                title=request.POST.get("title"), 
-                author = author,
-                description=request.POST.get("description"),                     
-                starting_bid=float(request.POST.get("starting bid")), 
-                image_url=request.POST.get("image"),
-                category=category
-            )
             
-            auction.save()
+            try:
+                category = Categories.objects.get(name=request.POST.get("category"))
+
+                auction = AuctionListings(
+                    title=request.POST.get("title"), 
+                    author = author,
+                    description=request.POST.get("description"),                     
+                    starting_bid=float(request.POST.get("starting bid")), 
+                    image_url=request.POST.get("image"),
+                    category=category
+                )
+
+                auction.save()
+
+            except Categories.DoesNotExist:
+                
+                auction = AuctionListings(
+                    title=request.POST.get("title"), 
+                    author = author,
+                    description=request.POST.get("description"),                     
+                    starting_bid=float(request.POST.get("starting bid")), 
+                    image_url=request.POST.get("image"),
+                    category=None
+                )
+                
+                auction.save()
                         
             return HttpResponseRedirect(reverse("index"))
-        except:
-            messages.error(request, "action failed!")
+        
+        except Exception as e:
+            messages.error(request, f"{e}")
 
     categories = Categories.objects.all()
 
