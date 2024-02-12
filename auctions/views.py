@@ -17,8 +17,8 @@ def index(request):
         auctions = auctions.filter(category=category)
 
     return render(request, "auctions/index.html", {
-        "auctions" : auctions,
-        "categories" : categories
+            "auctions" : auctions,
+            "categories" : categories
         })
 
 
@@ -105,18 +105,41 @@ def create_listing(request):
 def show_auction(request, item):
 
     auction = AuctionListings.objects.get(title=item)
-    bids = Bids.objects.get(auction_id=auction.id)
-    # watchlist = User.auctionlistings_set.filter(username=request.).all()
+    bids = Bids.objects.filter(auction_id=auction)
 
-    if request.method == "POST":
-        # post bids(if user is authenticaded), addition or removal from watchlist
-        # close auction if user is the author of the listing
-        # post comments if user is authenticated
-        pass
+    if request.user.is_authenticated:
+        user = User.objects.get(username=request.user.username)
+        watchlist = user.watchlist.all()
 
-    return render(request, "auctions/auction.html", {
-        "auction": auction 
-    })
+        print(watchlist)
+
+        if request.method == "POST":
+            # addition or removal from watchlist
+            watchlist = User.object.filter(username=request.username)
+            
+            
+
+            # post bids(if user is authenticaded)
+            # close auction if user is the author of the listing
+            # post comments if user is authenticated
+
+        return render(request, "auctions/auction.html", {
+            "auction": auction,
+            "number_of_bids": len(bids),
+            "watchlis": watchlist 
+        })
+    else:
+        return render(request, "auctions/auction.html", {
+            "auction": auction,
+            "number_of_bids": len(bids),
+        })
+
+
+def add_watchlist(request):
+    pass
+
+def remove_watchlist(request):
+    pass
 
 def watchlist(request):
     user = User.objects.get(username=request.user.username)

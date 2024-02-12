@@ -20,7 +20,7 @@ class AuctionListings(models.Model):
     description = models.CharField(max_length=150)
     active = models.BooleanField(default=True)
     current_bid = models.DecimalField(max_digits=10, decimal_places=2)
-    users_watching = models.ManyToManyField(User, blank=True, related_name="watchlist")
+    users_watching = models.ManyToManyField(User, blank=True, null=True, related_name="watchlist")
 
     # https://www.geeksforgeeks.org/overriding-the-save-method-django-models/
     def save(self, *args, **kwargs):

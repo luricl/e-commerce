@@ -5,13 +5,60 @@
     <div>
         <div>
             <h3>{{ auction.title }}</h3>
-            <sub>{{ auction.category }}</sub>
         </div>
         <div class="w-auto p-3">
             <img src="{{ auction.image_url }}" class="img-responsive" >
-        </div>    
-        <p>{{ auction.description }}</p>
-        <h5>{{ auction.starting_bid }}</h5>
+        </div>
+        {% if user.is_authenticated %}
+            <div>
+                {% if auction.title in watchlist %}
+                    <form method="POST">
+                        <input class="btn btn-alert" type="submit" value="Remove">
+                    </form>
+                {% else %}
+                    <form method="POST">
+                        <input class="btn" type="submit" value="Add">
+                    </form>
+                {% endif %}
+            </div>    
+        {% endif %}
+        <div>
+            <h5>Current bid: ${{ auction.current_bid }}</h5>
+            <p>{{ number_of_bids }} bid(s) so far.</p>
+            {% if user.is_authenticated %}
+                {% if auction.author == user.username %}
+                    <form action="{% url 'show_auction' auction.title %}" method="POST">
+                        <input class="btn btn-danger" type="submit" value="Close auction">
+                    </form>
+                {% else %}
+                    <form method="POST">
+                        <input type="text" name="bid" id="bid" placeholder="Bid">
+                        <input class="btn btn-primary" type="submit" value="Submit">
+                    </form>
+                {% endif %}
+            {% endif %}
+        </div>
+        
+        <!--Details-->
+        <div>
+            <h5>Description</h5>
+            <p>{{ auction.description }}</p>
+        </div>
+        <div>
+            <h5>Details</h5>
+            <li>Listed by: {{ auction.author }}</li>
+            
+            {% if auction.category %}
+                <li>Category: {{ auction.category.name }}</li>
+            {% else %}
+                <li>Category: No category listed</li>
+            {% endif %}
+            
+            <li>Creation date: {{ auction.creation_date }}</li>
+            <li>Starting bid: ${{ auction.starting_bid }}</li>
+        </div>
+
+        <!--Add comments-->
     </div>
 
 {% endblock %}
