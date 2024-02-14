@@ -124,28 +124,29 @@ def create_listing(request):
 def show_auction(request, item):
 
     auction = AuctionListings.objects.get(title=item)
-    bids = Bids.objects.filter(auction_id=auction)
+    bids = Bids.objects.filter(auction=auction)
+    current_bid = None
+    num_of_bids = 0
+    in_watchlist = False
+
+    if bids:
+        current_bid = bids.order_by('-value')[0]
+        num_of_bids = len(bids)
 
     if request.user.is_authenticated:
         user = User.objects.get(username=request.user.username)
         
-        in_watchlist = bool()
         if user.watchlist.filter(id=auction.id):
             in_watchlist = True
-        else:
-            in_watchlist = False         
 
-        return render(request, "auctions/auction.html", {
-            "auction": auction,
-            "number_of_bids": len(bids),
-            "in_watchlist": in_watchlist 
-        })
-    else:
-        return render(request, "auctions/auction.html", {
-            "auction": auction,
-            "number_of_bids": len(bids),
-        })
-
+    return render(request, "auctions/auction.html", {
+        "auction": auction,
+        "bids": bids,
+        "current_bid": current_bid,
+        "num_of_bids": num_of_bids,
+        "in_watchlist": in_watchlist 
+    })
+    
 def add_watchlist(request, auction_id):
     auction = AuctionListings.objects.get(id=auction_id)
 
@@ -165,6 +166,19 @@ def remove_watchlist(request, auction_id):
     messages.warning(request, "Auction removed from watchlist!")
 
     return HttpResponseRedirect(reverse(show_auction, kwargs={"item": auction.title}))
+
+# def close_auction(request, auction_id):
+#     auction = AuctionListings.objects.get(id=auction_id)
+
+#     auction.active = False
+#     auction.save()
+
+
+
+#     return render(request, "auction/show_auction.html", {
+#                 "auctions" : auction,
+#                 "winner" : winner
+#             })
 
 def watchlist(request):
 
