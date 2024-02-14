@@ -109,7 +109,7 @@ def create_listing(request):
             return HttpResponseRedirect(reverse("index"))
         
         except Exception as e:
-            messages.error(request, f"{e}")
+            messages.error(request, "Error")
 
     categories = Categories.objects.all()
 
@@ -118,6 +118,9 @@ def create_listing(request):
                 })
     
 
+# post bids(if user is authenticaded)
+# close auction if user is the author of the listing
+# post comments if user is authenticated
 def show_auction(request, item):
 
     auction = AuctionListings.objects.get(title=item)
@@ -125,24 +128,17 @@ def show_auction(request, item):
 
     if request.user.is_authenticated:
         user = User.objects.get(username=request.user.username)
-        watchlist = user.watchlist.all()
-
-        print(watchlist)
-
-        if request.method == "POST":
-            # addition or removal from watchlist
-            watchlist = User.object.filter(username=request.username)
-            
-            
-
-            # post bids(if user is authenticaded)
-            # close auction if user is the author of the listing
-            # post comments if user is authenticated
+        
+        in_watchlist = bool()
+        if user.watchlist.filter(id=auction.id):
+            in_watchlist = True
+        else:
+            in_watchlist = False         
 
         return render(request, "auctions/auction.html", {
             "auction": auction,
             "number_of_bids": len(bids),
-            "watchlis": watchlist 
+            "in_watchlist": in_watchlist 
         })
     else:
         return render(request, "auctions/auction.html", {
@@ -150,22 +146,37 @@ def show_auction(request, item):
             "number_of_bids": len(bids),
         })
 
+def add_watchlist(request, auction_id):
+    auction = AuctionListings.objects.get(id=auction_id)
 
-def add_watchlist(request):
-    pass
+    auction.users_watching.add(request.user)
+    auction.save()
 
-def remove_watchlist(request):
-    pass
+    messages.success(request, "Auction added to watchlist!")
+
+    return HttpResponseRedirect(reverse(show_auction, kwargs={"item": auction.title}))
+
+def remove_watchlist(request, auction_id):
+    auction = AuctionListings.objects.get(id=auction_id)
+
+    auction.users_watching.remove(request.user)
+    auction.save()
+
+    messages.warning(request, "Auction removed from watchlist!")
+
+    return HttpResponseRedirect(reverse(show_auction, kwargs={"item": auction.title}))
 
 def watchlist(request):
-    user = User.objects.get(username=request.user.username)
-    
-    auctions = user.watchlist.all()
+
+    auctions = request.user.watchlist.all()
     categories = Categories.objects.all()
 
-    if request.method == "POST":
-        category = Categories.objects.get(name=request.POST.get("category"))
-        auctions = auctions.filter(category=category)
+    if request.user.is_authenticated:
+        user = User.objects.get(username=request.user.username)
+
+        if request.method == "POST":
+            category = Categories.objects.get(name=request.POST.get("category"))
+            auctions = auctions.filter(category=category)
 
     return render(request, "auctions/watchlist.html", {
             "auctions" : auctions,

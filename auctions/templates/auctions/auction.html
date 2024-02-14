@@ -1,44 +1,56 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div {% if message.tags %}  class="alert alert-{{ message.tags }}"{% endif %}>
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}  
 
-    <div>
+    <div class="text-center">
         <div>
             <h3>{{ auction.title }}</h3>
         </div>
-        <div class="w-auto p-3">
-            <img src="{{ auction.image_url }}" class="img-responsive" >
+        <div class="m-3">
+            <img src="{{ auction.image_url }}" class="img-responsive" height="400px" widht="auto">
         </div>
-        {% if user.is_authenticated %}
-            <div>
-                {% if auction.title in watchlist %}
-                    <form method="POST">
-                        <input class="btn btn-alert" type="submit" value="Remove">
-                    </form>
-                {% else %}
-                    <form method="POST">
-                        <input class="btn" type="submit" value="Add">
-                    </form>
-                {% endif %}
-            </div>    
-        {% endif %}
         <div>
             <h5>Current bid: ${{ auction.current_bid }}</h5>
             <p>{{ number_of_bids }} bid(s) so far.</p>
-            {% if user.is_authenticated %}
-                {% if auction.author == user.username %}
-                    <form action="{% url 'show_auction' auction.title %}" method="POST">
+        </div>
+        {% if user.is_authenticated %}
+            <div class="my-3">
+                {% if auction.author == user %}
+                    <form action="{% url 'close_auction' auction.id %}">
+                        {% csrf_token %}
                         <input class="btn btn-danger" type="submit" value="Close auction">
                     </form>
                 {% else %}
-                    <form method="POST">
-                        <input type="text" name="bid" id="bid" placeholder="Bid">
-                        <input class="btn btn-primary" type="submit" value="Submit">
-                    </form>
+                    {% if in_watchlist %}
+                        <form action="{% url 'remove_watchlist' auction.id %}">
+                            <input class="btn btn-danger" type="submit" value="Remove from watchlist">
+                        </form>
+                    {% else %}
+                        <form action="{% url 'add_watchlist' auction.id %}">
+                            <input class="btn btn-primary" type="submit" value="Add to watchlist">
+                        </form>
+                    {% endif %}
+                    <div class="my-3">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="text" name="bid" id="bid" placeholder="Bid">
+                            <input class="btn btn-primary" type="submit" value="Submit">
+                        </form>
+                    </div>
                 {% endif %}
-            {% endif %}
-        </div>
-        
+            </div>
+        {% endif %}
+        </div>  
         <!--Details-->
         <div>
             <h5>Description</h5>
