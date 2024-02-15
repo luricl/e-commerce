@@ -118,18 +118,22 @@ def create_listing(request):
                 })
     
 
-# post comments if user is authenticated
 def show_auction(request, item):
 
     auction = AuctionListings.objects.get(title=item)
     bids = Bids.objects.filter(auction=auction)
-    current_price = auction.starting_bid
+    current_price = 0
+    comments = Comments.objects.filter(auction=auction)
+    
+    print(comments)
+
     num_of_bids = 0
     winner = None
     in_watchlist = False
 
     if bids:
         current_price = bids.order_by('-value')[0].value
+        min_bid = float(current_price) + 0.01
         winner = bids.order_by('-value')[0].user
         num_of_bids = len(bids)
 
@@ -144,7 +148,9 @@ def show_auction(request, item):
         "bids": bids,
         "winner": winner,
         "current_price": current_price,
+        "min_bid": min_bid,
         "num_of_bids": num_of_bids,
+        "comments": comments,
         "in_watchlist": in_watchlist 
     })
 
@@ -209,5 +215,13 @@ def bid(request, auction_id):
 
     return HttpResponseRedirect(reverse(show_auction, kwargs={"item": auction.title}))
 
+
 def comment(request, auction_id):
-    pass
+    auction = AuctionListings.objects.get(id=auction_id)
+
+    comment = Comments(user=request.user, auction=auction, body=request.POST["add_comment"])
+    comment.save()
+
+    messages.success(request, "Comment added!")
+
+    return HttpResponseRedirect(reverse(show_auction, kwargs={"item": auction.title}))

@@ -48,7 +48,7 @@
                         <div class="my-3">
                             <form action="{% url 'make_bid' auction.id %}" method="POST">
                                 {% csrf_token %}
-                                <input type="number" name="bid" id="bid" min="{{ current_price }}" placeholder="Bid">
+                                <input type="number" name="bid" id="bid" min="{{ min_bid }}" placeholder="Bid" step=".01">
                                 <input class="btn btn-primary" type="submit" value="Submit">
                             </form>
                         </div>
@@ -65,12 +65,12 @@
     
     <!--Details-->
     
-    <div>
-        <h5>Description</h5>
+    <di class="my-3"v>
+        <h4><strong>Description</strong></h4>
         <p>{{ auction.description }}</p>
     </div>
-    <div>
-        <h5>Details</h5>
+    <div >
+        <h4><strong>Details</strong></h4>
         <li>Listed by: {{ auction.author }}</li>
         
         {% if auction.category %}
@@ -83,10 +83,38 @@
         <li>Starting bid: ${{ auction.starting_bid }}</li>
     </div>
 
-    <!--Add comments-->
-    <!-- <div>
-        <h5>Comments</h5>
-        <
-    </div> -->
+    <!-- Comments-->
+    <div class="my-3">
+        <h4><strong>Comments</strong></h4>
+        {% if user.is_authenticated %}
+            <div class="form-group mb-4">
+                <form action="{% url 'add_comment' auction.id %}" method="POST">
+                    {% csrf_token %}
+                    <label for="add_comment">Add comment</label>
+                    <textarea class="form-control" type="text" id="add_comment" name="add_comment" rows="3" placeholder="Add comment"></textarea>
+                    <input type="submit" class="btn btn-primary my-2" value="Submit">
+                </form>
+            </div>
+        {% endif %}
+        {% for comment in comments %}
+            <div class="card m-3">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">
+                            <h5 class="card-title">{{ user.username }}</h5>
+                        </div>
+                        <div class="col text-right">
+                            <p class="text-muted">{{ comment.creation_date }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body m-1">
+                    <div class="row">
+                        <p class="card-text">{{ comment.body }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 
 {% endblock %}

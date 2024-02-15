@@ -29,6 +29,8 @@ class Bids(models.Model):
 
 class Comments(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comment_author")
-    auction = models.ForeignKey(AuctionListings, on_delete=models.CASCADE, related_name="commented_auction")
+    # change the related name
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
+    auction = models.ForeignKey(AuctionListings, on_delete=models.CASCADE, related_name="comments")
+    creation_date = models.DateTimeField(auto_now_add=True)
     body = models.CharField(max_length=10000)
