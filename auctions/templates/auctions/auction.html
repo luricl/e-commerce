@@ -22,7 +22,9 @@
         {% if auction.active %}
             <div>
                 {% if bids %}
-                    <h5>Current bid: ${{ current_bid }}</h5>
+                    <h5>Current bid: ${{ current_price }}</h5>
+                {% else %}
+                    <h5>Starting bid: ${{ auction.starting_bid }}</h5>
                 {% endif %}
                 <p>{{ num_of_bids }} bid(s) so far.</p>
             </div>
@@ -44,9 +46,9 @@
                             </form>
                         {% endif %}
                         <div class="my-3">
-                            <form method="POST">
+                            <form action="{% url 'make_bid' auction.id %}" method="POST">
                                 {% csrf_token %}
-                                <input type="text" name="bid" id="bid" placeholder="Bid">
+                                <input type="number" name="bid" id="bid" min="{{ current_price }}" placeholder="Bid">
                                 <input class="btn btn-primary" type="submit" value="Submit">
                             </form>
                         </div>
@@ -55,7 +57,7 @@
             {% endif %}
         {% else %}
             <div>
-                <h4>The winner of the auction is: <strong>{{ winner }}</strong></h4>
+                <h4>The winner of the auction is: <strong>{{ winner.username }}</strong></h4>
                 <p><small>This auction doesn't accept bids anymore</small></p>
             </div>
         {% endif %}
@@ -82,5 +84,9 @@
     </div>
 
     <!--Add comments-->
+    <!-- <div>
+        <h5>Comments</h5>
+        <
+    </div> -->
 
 {% endblock %}

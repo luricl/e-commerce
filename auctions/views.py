@@ -7,7 +7,7 @@ from django.contrib import messages
 
 from .models import User, AuctionListings, Categories, Bids, Comments
 
-
+# fix categories bug: submit empty field
 def index(request):
     auctions = AuctionListings.objects.filter(active=True)
     categories = Categories.objects.all()
@@ -118,19 +118,19 @@ def create_listing(request):
                 })
     
 
-# post bids(if user is authenticaded)
-# close auction if user is the author of the listing
 # post comments if user is authenticated
 def show_auction(request, item):
 
     auction = AuctionListings.objects.get(title=item)
     bids = Bids.objects.filter(auction=auction)
-    current_bid = None
+    current_price = auction.starting_bid
     num_of_bids = 0
+    winner = None
     in_watchlist = False
 
     if bids:
-        current_bid = bids.order_by('-value')[0]
+        current_price = bids.order_by('-value')[0].value
+        winner = bids.order_by('-value')[0].user
         num_of_bids = len(bids)
 
     if request.user.is_authenticated:
@@ -142,43 +142,12 @@ def show_auction(request, item):
     return render(request, "auctions/auction.html", {
         "auction": auction,
         "bids": bids,
-        "current_bid": current_bid,
+        "winner": winner,
+        "current_price": current_price,
         "num_of_bids": num_of_bids,
         "in_watchlist": in_watchlist 
     })
-    
-def add_watchlist(request, auction_id):
-    auction = AuctionListings.objects.get(id=auction_id)
 
-    auction.users_watching.add(request.user)
-    auction.save()
-
-    messages.success(request, "Auction added to watchlist!")
-
-    return HttpResponseRedirect(reverse(show_auction, kwargs={"item": auction.title}))
-
-def remove_watchlist(request, auction_id):
-    auction = AuctionListings.objects.get(id=auction_id)
-
-    auction.users_watching.remove(request.user)
-    auction.save()
-
-    messages.warning(request, "Auction removed from watchlist!")
-
-    return HttpResponseRedirect(reverse(show_auction, kwargs={"item": auction.title}))
-
-# def close_auction(request, auction_id):
-#     auction = AuctionListings.objects.get(id=auction_id)
-
-#     auction.active = False
-#     auction.save()
-
-
-
-#     return render(request, "auction/show_auction.html", {
-#                 "auctions" : auction,
-#                 "winner" : winner
-#             })
 
 def watchlist(request):
 
@@ -196,3 +165,49 @@ def watchlist(request):
             "auctions" : auctions,
             "categories" : categories
         })
+
+
+def add_watchlist(request, auction_id):
+    auction = AuctionListings.objects.get(id=auction_id)
+
+    auction.users_watching.add(request.user)
+    auction.save()
+
+    messages.success(request, "Auction added to watchlist!")
+
+    return HttpResponseRedirect(reverse(show_auction, kwargs={"item": auction.title}))
+
+
+def remove_watchlist(request, auction_id):
+    auction = AuctionListings.objects.get(id=auction_id)
+
+    auction.users_watching.remove(request.user)
+    auction.save()
+
+    messages.warning(request, "Auction removed from watchlist!")
+
+    return HttpResponseRedirect(reverse(show_auction, kwargs={"item": auction.title}))
+
+
+def close_auction(request, auction_id):
+    auction = AuctionListings.objects.get(id=auction_id)
+
+    auction.active = False
+    auction.save()
+
+    return HttpResponseRedirect(reverse(show_auction, kwargs={"item": auction.title}))
+
+
+def bid(request, auction_id):
+    auction = AuctionListings.objects.get(id=auction_id)
+    bid_value = request.POST["bid"]
+
+    new_bid = Bids(user=request.user, auction=auction, value=bid_value)
+    new_bid.save()
+
+    messages.success(request, "Bid added!")
+
+    return HttpResponseRedirect(reverse(show_auction, kwargs={"item": auction.title}))
+
+def comment(request, auction_id):
+    pass
