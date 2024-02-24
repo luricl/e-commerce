@@ -1,7 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-# Challenge: reimplement this
 class User(AbstractUser):
     id = models.AutoField(primary_key=True)
 
@@ -17,6 +16,7 @@ class AuctionListings(models.Model):
     category = models.ForeignKey(Categories, on_delete=models.PROTECT, blank=True, null=True, related_name="auctions")
     creation_date = models.DateTimeField(auto_now_add=True)
     starting_bid = models.DecimalField(max_digits=10, decimal_places=2)
+    current_bid = models.ForeignKey('Bids', on_delete=models.PROTECT, related_name="winning_auctions")
     description = models.CharField(max_length=150)
     active = models.BooleanField(default=True)
     users_watching = models.ManyToManyField(User, blank=True, related_name="watchlist")
@@ -29,7 +29,6 @@ class Bids(models.Model):
 
 class Comments(models.Model):
     id = models.AutoField(primary_key=True)
-    # change the related name
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
     auction = models.ForeignKey(AuctionListings, on_delete=models.CASCADE, related_name="comments")
     creation_date = models.DateTimeField(auto_now_add=True)
