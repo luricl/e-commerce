@@ -74,7 +74,7 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
-def create_listing(request):
+def create_auction(request):
     if request.method == "POST":
         try:
             author = request.user
@@ -108,7 +108,7 @@ def create_listing(request):
                         
             return HttpResponseRedirect(reverse("index"))
         
-        except Exception as e:
+        except:
             messages.error(request, "Error")
 
     categories = Categories.objects.all()
@@ -122,11 +122,10 @@ def show_auction(request, item):
 
     auction = AuctionListings.objects.get(title=item)
     bids = Bids.objects.filter(auction=auction)
-    current_price = 0
     comments = Comments.objects.filter(auction=auction)
     
-    print(comments)
-
+    # initializing variables
+    current_price = 0
     num_of_bids = 0
     winner = None
     in_watchlist = False
