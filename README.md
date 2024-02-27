@@ -1,4 +1,4 @@
-# Commerce
+# E-commerce auction site
 
 
 <p align="center">
@@ -6,7 +6,7 @@
 </p>
 
 
-This is a simple e-commerce like project using django and sqlite3. It is possible register/login users, make bids, filter auctions listings, make comments on the listings and add them to a wishlist. You can also list new auctions and close them as well. The demo is [here](https://youtu.be/AXfDrMC3Z6A?si=zUXYXSK8DxNMi2Sn)
+This is a simple e-bay like project using django and sqlite3. It is possible register/login users, make bids, filter auction listings, make comments on the listings and add them to a wishlist. You can also mke new listings and close them as well. The demo can be watched [here](https://youtu.be/AXfDrMC3Z6A?si=zUXYXSK8DxNMi2Sn)
 
 
 ## Usage
