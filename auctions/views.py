@@ -12,9 +12,10 @@ def index(request):
     auctions = AuctionListings.objects.filter(active=True)
     categories = Categories.objects.all()
 
-    if request.method == "POST":
-        category = Categories.objects.get(name=request.POST.get("category"))
-        auctions = auctions.filter(category=category)
+    if request.method == "POST": 
+        if request.POST.get("category") != "Category":
+            category = Categories.objects.get(name=request.POST.get("category"))
+            auctions = auctions.filter(category=category)
 
     return render(request, "auctions/index.html", {
             "auctions" : auctions,
@@ -86,7 +87,7 @@ def create_auction(request):
                     title=request.POST.get("title"), 
                     author = author,
                     description=request.POST.get("description"),                     
-                    starting_bid=float(request.POST.get("starting bid")), 
+                    starting_price=float(request.POST.get("starting bid")), 
                     image_url=request.POST.get("image"),
                     category=category
                 )
@@ -99,7 +100,7 @@ def create_auction(request):
                     title=request.POST.get("title"), 
                     author = author,
                     description=request.POST.get("description"),                     
-                    starting_bid=float(request.POST.get("starting bid")), 
+                    starting_price=float(request.POST.get("starting bid")), 
                     image_url=request.POST.get("image"),
                     category=None
                 )
@@ -125,16 +126,13 @@ def show_auction(request, item):
     comments = Comments.objects.filter(auction=auction)
     
     # initializing variables
-    current_price = 0
-    num_of_bids = 0
+    min_bid = auction.starting_price
     winner = None
     in_watchlist = False
 
-    if bids:
-        current_price = bids.order_by('-value')[0].value
-        min_bid = float(current_price) + 0.01
-        winner = bids.order_by('-value')[0].user
-        num_of_bids = len(bids)
+    if auction.current_bid:
+        min_bid = float(auction.current_bid.value) + 0.01
+        winner = auction.current_bid.user
 
     if request.user.is_authenticated:
         user = User.objects.get(username=request.user.username)
@@ -146,9 +144,8 @@ def show_auction(request, item):
         "auction": auction,
         "bids": bids,
         "winner": winner,
-        "current_price": current_price,
         "min_bid": min_bid,
-        "num_of_bids": num_of_bids,
+        "num_of_bids": len(bids),
         "comments": comments,
         "in_watchlist": in_watchlist 
     })
@@ -204,13 +201,21 @@ def close_auction(request, auction_id):
 
 
 def bid(request, auction_id):
-    auction = AuctionListings.objects.get(id=auction_id)
-    bid_value = request.POST["bid"]
+    try:
+        auction = AuctionListings.objects.get(id=auction_id)
+        bid_value = float(request.POST["bid"]) 
 
-    new_bid = Bids(user=request.user, auction=auction, value=bid_value)
-    new_bid.save()
+        new_bid = Bids(user=request.user, auction=auction, value=bid_value)
+        new_bid.save()
 
-    messages.success(request, "Bid added!")
+
+        auction.current_bid = new_bid
+        auction.save()
+
+        messages.success(request, "Bid added!")
+    
+    except:
+        messages.error(request, "Error!")
 
     return HttpResponseRedirect(reverse(show_auction, kwargs={"item": auction.title}))
 

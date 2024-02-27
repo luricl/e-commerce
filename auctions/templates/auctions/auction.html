@@ -12,6 +12,8 @@
         </div>
     {% endif %}  
 
+    <!-- Validate bid form -->
+
     <div class="text-center">
         <div>
             <h3>{{ auction.title }}</h3>
@@ -21,10 +23,11 @@
         </div>
         {% if auction.active %}
             <div>
-                {% if bids %}
-                    <h5>Current bid: ${{ current_price }}</h5>
+                <!--  change this -->
+                {% if auction.current_bid %}
+                    <h5>Current bid: ${{ auction.current_bid.value }}</h5>
                 {% else %}
-                    <h5>Starting bid: ${{ auction.starting_bid }}</h5>
+                    <h5>Starting price: ${{ auction.starting_price }}</h5>
                 {% endif %}
                 <p>{{ num_of_bids }} bid(s) so far.</p>
             </div>
@@ -80,7 +83,7 @@
         {% endif %}
         
         <li>Creation date: {{ auction.creation_date }}</li>
-        <li>Starting bid: ${{ auction.starting_bid }}</li>
+        <li>Starting bid: ${{ auction.starting_price }}</li>
     </div>
 
     <!-- Comments-->
@@ -101,7 +104,7 @@
                 <div class="card-header">
                     <div class="row">
                         <div class="col">
-                            <h5 class="card-title">{{ user.username }}</h5>
+                            <h5 class="card-title">{{ comment.user.username }}</h5>
                         </div>
                         <div class="col text-right">
                             <p class="text-muted">{{ comment.creation_date }}</p>
