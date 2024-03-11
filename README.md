@@ -1,4 +1,4 @@
-# E-commerce auction site
+# E-commerce website
 
 
 <p align="center">
